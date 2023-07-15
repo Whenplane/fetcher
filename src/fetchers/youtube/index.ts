@@ -53,6 +53,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		"&order=date" +
 		"&type=video" +
 		"&eventType=live" +
+		"&date=" + Date.now() +
 		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json()) as any;
 
