@@ -13,5 +13,6 @@ export async function getLiveCount(state: DurableObjectState) {
 	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length
 
 	state.storage.put(COUNT_VALUE, liveCount);
+
 	return liveCount;
 }
