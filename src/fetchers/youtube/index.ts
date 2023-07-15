@@ -38,7 +38,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const liveCount = await getLiveCount(state);
 	const lastCount = await state.storage.get(LASTCOUNT);
 
-	if(Date.now() - lastFetch < (15 * 60e3) && liveCount == lastCount) {
+	if(Date.now() - lastFetch < (20 * 60e3) && liveCount == lastCount) {
 		return await state.storage.get(LIST_VALUE);
 	}
 
