@@ -19,6 +19,6 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const id = await env.WHENISWAN_FETCHER.idFromName("dev")
 		const stub = env.WHENISWAN_FETCHER.get(id);
-		return stub.fetch("https://do/youtube")
+		return stub.fetch(request.url)
 	},
 };
