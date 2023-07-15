@@ -49,7 +49,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		"https://www.googleapis.com/youtube/v3/search" +
 		"?part=snippet" +
 		"&channelId=UCXuqSBlHAE6Xw-yeJA0Tunw" +
-		"&maxResults=1" +
+		"&maxResults=50" +
 		"&order=date" +
 		"&type=video" +
 		"&eventType=live" +
