@@ -13,8 +13,10 @@ export class FetcherObject {
 	async fetch(request: Request) {
 		const url = new URL(request.url);
 		if(url.pathname === "/youtube") {
+			const response = await getLiveInfo(this.state, this.env);
+			console.log({response})
 			return Response.json(
-				await getLiveInfo(this.state, this.env)
+				response
 			)
 		}
 	}
