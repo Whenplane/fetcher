@@ -38,7 +38,14 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const liveCount = await getLiveCount(state);
 	const lastCount = await state.storage.get(LASTCOUNT);
 
-	if(Date.now() - lastFetch < (20 * 60e3) && liveCount == lastCount) {
+	// When there are 2 livestreams (good chance the latter is WAN), update every 6 minutes. Otherwise, every 10 mins.
+	const cacheTime = liveCount > 1 ? (5 * 60e3) : (10 * 60e3);
+
+	if(
+		Date.now() - lastFetch < cacheTime &&
+		// skip cache if number of livestreams changes (usually happens when WAN starts or ends)
+		liveCount == lastCount
+	) {
 		return await state.storage.get(LIST_VALUE);
 	}
 
@@ -54,7 +61,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		"&type=video" +
 		"&eventType=live" +
 		"&date=" + Date.now() +
-		"&key=" + env.YOUTUBE_KEY
+		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
 
 	const items = liveData?.items;
@@ -64,4 +71,30 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 
 	state.storage.put(LIST_VALUE, items);
 	return items;
+}
+
+
+let keyIndex: number | undefined;
+
+export function getKey(env: Env) {
+
+	const keys = [
+		env.YOUTUBE_KEY_DO,
+		env.YOUTUBE_KEY,
+		env.YOUTUBE_KEY_2,
+		env.YOUTUBE_KEY_3
+	]
+	if(typeof keyIndex == 'undefined') keyIndex = Math.floor(Math.random() * keys.length);
+
+	let key = undefined;
+	let i = 0;
+	while(key == undefined) {
+		keyIndex++;
+		if(keyIndex >= keys.length) {
+			keyIndex = 0;
+		}
+		key = keys[keyIndex];
+		if(i++ > 50) return undefined;
+	}
+	return key;
 }

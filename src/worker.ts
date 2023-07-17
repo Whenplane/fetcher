@@ -13,6 +13,9 @@ export { FetcherObject } from './FetcherObject'
 export interface Env {
 	WHENISWAN_FETCHER: DurableObjectNamespace,
 	YOUTUBE_KEY: string
+	YOUTUBE_KEY_2?: string
+	YOUTUBE_KEY_3?: string
+	YOUTUBE_KEY_DO?: string
 }
 
 const rateLimit: {

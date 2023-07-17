@@ -1,4 +1,5 @@
 import { Env } from '../../worker';
+import { getKey } from './index';
 
 export async function getSpecificData(state: DurableObjectState, id: string, env: Env) {
 	const LASTFETCH = "api_specific:" + id + ":lastFetch";
@@ -18,7 +19,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 		"&order=date" +
 		"&type=video" +
 		"&eventType=live" +
-		"&key=" + env.YOUTUBE_KEY
+		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
 
 	state.storage.put(LASTDATA, specificData);
