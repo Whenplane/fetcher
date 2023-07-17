@@ -34,7 +34,9 @@ export default {
 			return Response.json({message: "Too many requests! Slow down!"}, {status: 429});
 		}
 
-		const id = await env.WHENISWAN_FETCHER.idFromName("dev")
+		const youtube = new URL(request.url).searchParams.has("youtube")
+
+		const id = await env.WHENISWAN_FETCHER.idFromName(youtube ? "youtube" : "dev");
 		const stub = env.WHENISWAN_FETCHER.get(id);
 		return stub.fetch(request.url)
 	},
