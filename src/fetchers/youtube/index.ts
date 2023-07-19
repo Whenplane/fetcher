@@ -8,6 +8,7 @@ const LASTCOUNT = "lastcount";
 
 export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
+	const liveCount = getLiveCount(state);
 	const items = await getLiveList(state, env);
 
 	let isWAN;
@@ -28,7 +29,7 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 	return {
 		isWAN,
-		isLive: items.length > 0,
+		isLive: (await liveCount) > 0,
 		started
 	}
 }
