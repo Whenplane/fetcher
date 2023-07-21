@@ -8,7 +8,7 @@ const LASTCOUNT = "lastcount";
 
 export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
-	const liveCount = getLiveCount(state);
+	const liveCount = getLiveCount(state, env);
 	const items = await getLiveList(state, env);
 
 	let isWAN;
@@ -36,10 +36,10 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 export async function getLiveList(state: DurableObjectState, env: Env) {
 	const lastFetch: number = (await state.storage.get(LIST_LASTFETCH)) || 0;
-	const liveCount = await getLiveCount(state);
+	const liveCount = await getLiveCount(state, env);
 	const lastCount = await state.storage.get(LASTCOUNT);
 
-	// When there are 2 livestreams (good chance the latter is WAN), update every 6 minutes. Otherwise, every 10 mins.
+	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
 	const cacheTime = liveCount > 1 ? (5 * 60e3) : (10 * 60e3);
 
 	if(
@@ -49,15 +49,15 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	) {
 		return await state.storage.get(LIST_VALUE);
 	} else if(liveCount != lastCount && env.DISCORD_WEBHOOK) {
-		fetch(env.DISCORD_WEBHOOK, {
+		v(fetch(env.DISCORD_WEBHOOK, {
 			method: "POST",
 			body: JSON.stringify(
 				{
-					content: "Cache bypassed due to liveCount change!" + lastCount + " to " + liveCount
+					content: "Cache bypassed due to liveCount change! " + lastCount + " to " + liveCount
 				}
 			),
 			headers: {"content-type": "application/json"}
-		})
+		}))
 	}
 
 	state.storage.put(LIST_LASTFETCH, Date.now());
@@ -109,3 +109,6 @@ export function getKey(env: Env) {
 	}
 	return key;
 }
+
+// this just exists to stop my IDE from complaining about the promises not being awaited
+export function v(p: Promise<any>) {}
