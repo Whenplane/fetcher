@@ -16,6 +16,7 @@ export interface Env {
 	YOUTUBE_KEY_2?: string
 	YOUTUBE_KEY_3?: string
 	YOUTUBE_KEY_DO?: string
+	DISCORD_WEBHOOK?: string
 }
 
 const rateLimit: {

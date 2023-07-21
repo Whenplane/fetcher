@@ -48,6 +48,16 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		liveCount == lastCount
 	) {
 		return await state.storage.get(LIST_VALUE);
+	} else if(liveCount != lastCount && env.DISCORD_WEBHOOK) {
+		fetch(env.DISCORD_WEBHOOK, {
+			method: "POST",
+			body: JSON.stringify(
+				{
+					content: "Cache bypassed due to liveCount change!" + lastCount + " to " + liveCount
+				}
+			),
+			headers: {"content-type": "application/json"}
+		})
 	}
 
 	state.storage.put(LIST_LASTFETCH, Date.now());
