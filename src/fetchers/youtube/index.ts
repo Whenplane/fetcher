@@ -50,7 +50,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		return await state.storage.get(LIST_VALUE);
 	} else if(liveCount != lastCount) {
 		// wait 5 seconds before expiring cache to allow Google's cache to calm down
-		state.storage.put(LIST_LASTFETCH, Date.now() - cacheTime + 5e3);
+		state.storage.put(LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
 		state.storage.put(LASTCOUNT, liveCount);
 		return await state.storage.get(LIST_VALUE);
 	}
