@@ -29,6 +29,7 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 	return {
 		isWAN,
+		videoId,
 		isLive: (await liveCount) > 0,
 		started
 	}
