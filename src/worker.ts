@@ -17,6 +17,9 @@ export interface Env {
 	YOUTUBE_KEY_3?: string
 	YOUTUBE_KEY_DO?: string
 	DISCORD_WEBHOOK?: string
+
+	// set to bypass ip check in dev
+	DEV?: string
 }
 
 const rateLimit: {
@@ -25,7 +28,12 @@ const rateLimit: {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const connectingIp = request.headers.get('cf-connecting-ip');
+		let connectingIp = request.headers.get('cf-connecting-ip');
+
+		if(!connectingIp && env.DEV) {
+			connectingIp = "DEV";
+		}
+
 		if(!connectingIp) {
 			return Response.json({message: "Missing IP"}, {status: 400});
 		}
@@ -37,7 +45,7 @@ export default {
 
 		const youtube = new URL(request.url).searchParams.has("youtube")
 
-		const id = await env.WHENISWAN_FETCHER.idFromName(youtube ? "youtube" : "dev");
+		const id = env.WHENISWAN_FETCHER.idFromName(youtube ? "youtube" : "dev");
 		const stub = env.WHENISWAN_FETCHER.get(id);
 		return stub.fetch(request.url)
 	},

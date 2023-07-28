@@ -21,17 +21,20 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	}
 
 	let started;
+	let snippet;
 
 	if(isWAN) {
 		const specificData = await getSpecificData(state, videoId, env);
-		started = specificData.items[0].liveStreamingDetails.actualStartTime
+		started = specificData.items[0].liveStreamingDetails.actualStartTime;
+		snippet = specificData.items[0].snippet;
 	}
 
 	return {
 		isWAN,
 		videoId,
 		isLive: (await liveCount) > 0,
-		started
+		started,
+		snippet
 	}
 }
 
