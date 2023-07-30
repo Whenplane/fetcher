@@ -41,10 +41,10 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 export async function getLiveList(state: DurableObjectState, env: Env) {
 	const lastFetch: number = (await state.storage.get(LIST_LASTFETCH)) || 0;
 	const liveCount = await getLiveCount(state, env);
-	const lastCount = await state.storage.get(LASTCOUNT);
+	const lastCount = (await state.storage.get(LASTCOUNT) as number) || 0;
 
 	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
-	const cacheTime = liveCount > 1 ? (5 * 60e3) : (10 * 60e3);
+	const cacheTime = (liveCount > 1 || lastCount > 1) ? (5 * 60e3) : (10 * 60e3);
 
 	if(
 		Date.now() - lastFetch < cacheTime &&
