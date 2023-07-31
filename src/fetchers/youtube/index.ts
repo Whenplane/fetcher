@@ -2,6 +2,8 @@ import { getLiveCount } from './scrapeFetch';
 import { Env } from '../../worker';
 import { getSpecificData } from './specificData';
 
+export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw";
+
 const LIST_LASTFETCH = "api_list:lastfetch";
 const LIST_VALUE = "api_list:list";
 const LASTCOUNT = "lastcount";
@@ -65,7 +67,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const liveData = await fetch(
 		"https://www.googleapis.com/youtube/v3/search" +
 		"?part=snippet" +
-		"&channelId=UCXuqSBlHAE6Xw-yeJA0Tunw" +
+		"&channelId=" + CHANNEL +
 		"&maxResults=50" +
 		"&order=date" +
 		"&type=video" +

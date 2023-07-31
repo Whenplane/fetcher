@@ -1,4 +1,4 @@
-import { v } from './index';
+import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 
 const COUNT_LASTFETCH = "scrape_livecount:last-fetch";
@@ -11,7 +11,7 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 	}
 	state.storage.put(COUNT_LASTFETCH, Date.now());
 
-	const pageData = await fetch("https://www.youtube.com/linustechtips/streams").then(r => r.text());
+	const pageData = await fetch("https://www.youtube.com/"+CHANNEL+"/streams").then(r => r.text());
 
 	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length
 
