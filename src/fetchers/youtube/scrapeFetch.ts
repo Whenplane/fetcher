@@ -16,7 +16,7 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length
 
 	// If the response is invalid, return the cached value
-	const isInvalidResponse = pageData.includes("This page checks");
+	const isInvalidResponse = pageData.includes("This page checks") || pageData.includes("Something went wrong");
 	if(isInvalidResponse) {
 		return (await state.storage.get(COUNT_VALUE) as number) || 0
 	}
