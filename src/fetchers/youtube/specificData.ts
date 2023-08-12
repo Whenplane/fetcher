@@ -13,7 +13,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 	state.storage.put(LASTFETCH, Date.now());
 
 	const specificData = await fetch("https://www.googleapis.com/youtube/v3/videos" +
-		"?part=liveStreamingDetails" +
+		"?part=liveStreamingDetails,snippet" +
 		"&id=" + id +
 		"&maxResults=1" +
 		"&order=date" +

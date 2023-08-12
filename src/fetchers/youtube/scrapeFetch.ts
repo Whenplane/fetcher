@@ -1,4 +1,4 @@
-import { v } from './index';
+import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 
 const COUNT_LASTFETCH = "scrape_livecount:last-fetch";
@@ -6,14 +6,20 @@ const COUNT_VALUE = "scrape_livecount:count";
 
 export async function getLiveCount(state: DurableObjectState, env: Env) {
 	const lastFetch: number = (await state.storage.get(COUNT_LASTFETCH)) || 0;
-	if(Date.now() - lastFetch < 5e3) { // cache for 5 seconds
+	if(Date.now() - lastFetch < 4750) { // cache for 5 seconds
 		return (await state.storage.get(COUNT_VALUE) as number) || 0;
 	}
 	state.storage.put(COUNT_LASTFETCH, Date.now());
 
-	const pageData = await fetch("https://www.youtube.com/linustechtips/streams").then(r => r.text());
+	const pageData = await fetch("https://www.youtube.com/channel/"+CHANNEL+"/streams").then(r => r.text());
 
 	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length
+
+	// If the response is invalid, return the cached value
+	const isInvalidResponse = pageData.includes("This page checks");
+	if(isInvalidResponse) {
+		return (await state.storage.get(COUNT_VALUE) as number) || 0
+	}
 
 	if(liveCount === 0 && env.DISCORD_WEBHOOK) {
 		v((async () => {

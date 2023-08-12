@@ -2,6 +2,8 @@ import { getLiveCount } from './scrapeFetch';
 import { Env } from '../../worker';
 import { getSpecificData } from './specificData';
 
+export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw";
+
 const LIST_LASTFETCH = "api_list:lastfetch";
 const LIST_VALUE = "api_list:list";
 const LASTCOUNT = "lastcount";
@@ -21,27 +23,30 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	}
 
 	let started;
+	let snippet;
 
 	if(isWAN) {
 		const specificData = await getSpecificData(state, videoId, env);
-		started = specificData.items[0].liveStreamingDetails.actualStartTime
+		started = specificData.items[0].liveStreamingDetails.actualStartTime;
+		snippet = specificData.items[0].snippet;
 	}
 
 	return {
 		isWAN,
 		videoId,
 		isLive: (await liveCount) > 0,
-		started
+		started,
+		snippet
 	}
 }
 
 export async function getLiveList(state: DurableObjectState, env: Env) {
 	const lastFetch: number = (await state.storage.get(LIST_LASTFETCH)) || 0;
 	const liveCount = await getLiveCount(state, env);
-	const lastCount = await state.storage.get(LASTCOUNT);
+	const lastCount = (await state.storage.get(LASTCOUNT) as number) || 0;
 
 	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
-	const cacheTime = liveCount > 1 ? (5 * 60e3) : (10 * 60e3);
+	const cacheTime = (liveCount > 1 || lastCount > 1) ? (5 * 60e3) : (10 * 60e3);
 
 	if(
 		Date.now() - lastFetch < cacheTime &&
@@ -62,7 +67,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const liveData = await fetch(
 		"https://www.googleapis.com/youtube/v3/search" +
 		"?part=snippet" +
-		"&channelId=UCXuqSBlHAE6Xw-yeJA0Tunw" +
+		"&channelId=" + CHANNEL +
 		"&maxResults=50" +
 		"&order=date" +
 		"&type=video" +
