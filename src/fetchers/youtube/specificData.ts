@@ -1,16 +1,17 @@
 import { Env } from '../../worker';
-import { getKey } from './index';
+import { getKey, v } from './index';
+import { get, put } from '../../storageCacher';
 
 export async function getSpecificData(state: DurableObjectState, id: string, env: Env) {
 	const LASTFETCH = "api_specific:" + id + ":lastFetch";
 	const LASTDATA = "api_specific:" + id + ":data";
 
-	const lastFetch: number = (await state.storage.get(LASTFETCH)) || 0;
+	const lastFetch: number = (await get(state, LASTFETCH)) || 0;
 	if(Date.now() - lastFetch < 15 * 60e3) {
-		return await state.storage.get(LASTDATA);
+		return await get(state, LASTDATA);
 	}
 
-	state.storage.put(LASTFETCH, Date.now());
+	v(put(state, LASTFETCH, Date.now()));
 
 	const specificData = await fetch("https://www.googleapis.com/youtube/v3/videos" +
 		"?part=liveStreamingDetails,snippet" +
@@ -22,7 +23,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
 
-	state.storage.put(LASTDATA, specificData);
+	put(state, LASTDATA, specificData);
 
 	return specificData;
 }

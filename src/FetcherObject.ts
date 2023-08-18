@@ -1,6 +1,7 @@
 import { Env } from './worker';
 import { getLiveInfo } from './fetchers/youtube';
 import { getLiveCount } from './fetchers/youtube/scrapeFetch';
+import { get } from './storageCacher';
 
 export class FetcherObject {
 	state: DurableObjectState
@@ -20,8 +21,8 @@ export class FetcherObject {
 		} else if(url.pathname === "/liveCount") {
 			return Response.json(
 				{
-					liveCount: await getLiveCount(this.state),
-					lastCount: await this.state.storage.get("lastcount")
+					liveCount: await getLiveCount(this.state, this.env),
+					lastCount: await get(this.state, "lastcount")
 				}
 			)
 		}

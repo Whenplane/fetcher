@@ -1,6 +1,7 @@
 import { getLiveCount } from './scrapeFetch';
 import { Env } from '../../worker';
 import { getSpecificData } from './specificData';
+import { get, put } from '../../storageCacher';
 
 export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw";
 
@@ -41,9 +42,9 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 }
 
 export async function getLiveList(state: DurableObjectState, env: Env) {
-	const lastFetch: number = (await state.storage.get(LIST_LASTFETCH)) || 0;
+	const lastFetch: number = (await get(state, LIST_LASTFETCH)) || 0;
 	const liveCount = await getLiveCount(state, env);
-	const lastCount = (await state.storage.get(LASTCOUNT) as number) || 0;
+	const lastCount = (await get(state, LASTCOUNT) as number) || 0;
 
 	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
 	const cacheTime = (liveCount > 1 || lastCount > 1) ? (5 * 60e3) : (10 * 60e3);
@@ -53,16 +54,16 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		// skip cache if number of livestreams changes (usually happens when WAN starts or ends)
 		liveCount == lastCount
 	) {
-		return await state.storage.get(LIST_VALUE);
+		return await get(state, LIST_VALUE);
 	} else if(liveCount != lastCount) {
 		// wait 5 seconds before expiring cache to allow Google's cache to calm down
-		await state.storage.put(LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
-		await state.storage.put(LASTCOUNT, liveCount);
-		return await state.storage.get(LIST_VALUE);
+		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
+		await put(state, LASTCOUNT, liveCount);
+		return await get(state, LIST_VALUE);
 	}
 
-	state.storage.put(LIST_LASTFETCH, Date.now());
-	state.storage.put(LASTCOUNT, liveCount);
+	v(put(state, LIST_LASTFETCH, Date.now()));
+	v(put(state, LASTCOUNT, liveCount));
 
 	const liveData = await fetch(
 		"https://www.googleapis.com/youtube/v3/search" +
@@ -82,11 +83,11 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	}
 
 	if(liveCount <= 1 && items.length >= 2) {
-		// if api response doesnt match livecount, retry again in 5 seconds
-		await state.storage.put(LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
+		// if api response doesn't match livecount, retry again in 5 seconds
+		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
 	}
 
-	state.storage.put(LIST_VALUE, items);
+	put(state, LIST_VALUE, items);
 	return items;
 }
 
