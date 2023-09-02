@@ -1,5 +1,5 @@
 import { Env } from './worker';
-import { getLiveInfo } from './fetchers/youtube';
+import { getLiveInfo, getLiveList } from './fetchers/youtube';
 import { getLiveCount } from './fetchers/youtube/scrapeFetch';
 import { get } from './storageCacher';
 
@@ -25,6 +25,10 @@ export class FetcherObject {
 					lastCount: await get(this.state, "lastcount")
 				}
 			)
+		} else if(url.pathname === "/listList") {
+			return Response.json({
+				list: await getLiveList(this.state, this.env)
+			});
 		}
 		return Response.json({message: "not found"}, {status: 404})
 	}
