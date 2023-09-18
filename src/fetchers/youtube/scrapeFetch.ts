@@ -22,7 +22,7 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 		return (await get(state, COUNT_VALUE) as number) || 0
 	}
 
-	if(liveCount === 0 && env.DISCORD_WEBHOOK && !pageData.includes("LTT TV")) {
+	if(liveCount === 0 && env.DISCORD_WEBHOOK && !pageData.includes("LTT TV") && !pageData.includes("WAN")) {
 		v((async () => {
 			if(!env.DISCORD_WEBHOOK) return;
 			const response = await fetch("https://bytebin.ajg0702.us/post", {
