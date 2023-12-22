@@ -19,7 +19,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 		"&maxResults=1" +
 		"&order=date" +
 		"&type=video" +
-		"&eventType=live" +
+		"&eventType=live,upcoming" +
 		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
 

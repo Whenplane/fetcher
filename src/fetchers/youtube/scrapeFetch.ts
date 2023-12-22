@@ -14,7 +14,8 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 
 	const pageData = await fetch("https://www.youtube.com/channel/"+CHANNEL+"/streams").then(r => r.text());
 
-	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length
+	const upcomingCount = (pageData.match(/"upcomingEventData":/g) || []).length
+	const liveCount = (pageData.match(/"iconType":"LIVE"/g) || []).length + upcomingCount
 
 	// If the response is invalid, return the cached value
 	const isInvalidResponse = pageData.includes("This page checks");

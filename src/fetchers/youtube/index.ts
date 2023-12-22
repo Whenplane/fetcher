@@ -26,11 +26,14 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	let started;
 	let snippet;
 
+	let upcoming = false;
+
 	if(isWAN) {
 		const specificData = await getSpecificData(state, videoId, env);
 		if(specificData.items && specificData.items[0]) {
-			started = specificData.items[0].liveStreamingDetails.actualStartTime;
+			started = specificData.items[0].liveStreamingDetails?.actualStartTime;
 			snippet = specificData.items[0].snippet;
+			upcoming = specificData.items[0].snippet?.liveBroadcastContent === "upcoming";
 		} else {
 			console.log(specificData)
 		}
@@ -39,9 +42,10 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	return {
 		isWAN,
 		videoId,
-		isLive: (await liveCount) > 0,
+		isLive: ((await liveCount) > 0) && !upcoming,
 		started,
-		snippet
+		snippet,
+		upcoming
 	}
 }
 
