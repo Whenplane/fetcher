@@ -43,6 +43,7 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 	const test = Date.now() < 1703698850773 && lastUpcomingSend == 0;
 	if(test || (upcoming && env.DISCORD_WEBHOOK && Date.now() - lastUpcomingSend > 10 * 60e3)) { // limit to one message every 10 minutes
+		console.log("Sending message!")
 		v((async () => {
 			if(!env.DISCORD_WEBHOOK) return;
 
