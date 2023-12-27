@@ -67,8 +67,8 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 			await fetch(env.DISCORD_WEBHOOK, {
 				method: "POST",
 				body: formData,
-				headers: {"content-type": "application/json"}
 			})
+			console.log("Message sent")
 			lastUpcomingSend = Date.now();
 		})())
 	}
