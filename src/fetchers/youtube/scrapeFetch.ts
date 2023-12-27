@@ -23,7 +23,12 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 		return (await get(state, COUNT_VALUE) as number) || 0
 	}
 
-	if(liveCount === 0 && env.DISCORD_WEBHOOK && !pageData.includes("LTT TV") && !pageData.includes("WAN")) {
+	if(
+		liveCount === 0 && env.DISCORD_WEBHOOK &&
+		!pageData.includes("LTT TV") && // don't count LTT TV (rip, please bring it back lmg)
+		!pageData.includes("WAN") &&
+		!pageData.includes("This channel has no videos.") // sometimes the page shows that ltt has no videos for some reason
+	) {
 		v((async () => {
 			if(!env.DISCORD_WEBHOOK) return;
 			const response = await fetch("https://bytebin.ajg0702.us/post", {

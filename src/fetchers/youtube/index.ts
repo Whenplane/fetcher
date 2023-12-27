@@ -9,6 +9,8 @@ const LIST_LASTFETCH = "api_list:lastfetch";
 const LIST_VALUE = "api_list:list";
 const LASTCOUNT = "lastcount";
 
+let lastUpcomingSend = 0;
+
 export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 	const liveCount = getLiveCount(state, env);
@@ -37,6 +39,37 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 		} else {
 			console.log(specificData)
 		}
+	}
+
+	const test = Date.now() < 1703698850773 && lastUpcomingSend == 0;
+	if(test || (upcoming && env.DISCORD_WEBHOOK && Date.now() - lastUpcomingSend > 10 * 60e3)) { // limit to one message every 10 minutes
+		v((async () => {
+			if(!env.DISCORD_WEBHOOK) return;
+
+			const formData = new FormData();
+
+			formData.append("payload_json", JSON.stringify(
+				{
+					content: `Stream is upcoming! <t:${(Math.floor(Date.now() / 1e3))}:D> <t:${(Math.floor(Date.now() / 1e3))}:T>`
+				}
+			));
+
+			formData.append(
+				"files[0]",
+				new Blob(
+					[JSON.stringify(items, undefined, '\t')],
+					{type: 'application/json'}
+				),
+				"items.json"
+			)
+
+			await fetch(env.DISCORD_WEBHOOK, {
+				method: "POST",
+				body: formData,
+				headers: {"content-type": "application/json"}
+			})
+			lastUpcomingSend = Date.now();
+		})())
 	}
 
 	return {
@@ -80,7 +113,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		"&maxResults=50" +
 		"&order=date" +
 		"&type=video" +
-		"&eventType=live" +
+		"&eventType=live,upcoming" +
 		"&date=" + Date.now() +
 		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
