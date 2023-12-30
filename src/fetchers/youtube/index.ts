@@ -19,7 +19,7 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	let isWAN;
 	let videoId;
 
-	for (const item of items) {
+	for (const item of (items ?? [])) {
 		isWAN = item.snippet.title.includes("WAN");
 		videoId = item.id?.videoId
 		if(isWAN) break;
@@ -119,7 +119,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const items = liveData?.items;
 
 	const now = new Date();
-	if(items && items.length == 0 && now.getDay() >= 5 && (now.getUTCHours() === 11 || now.getUTCHours() <= 7)) {
+	if(items && items.length == 0 && ((now.getDay() >= 5 && (now.getUTCHours() === 11 || now.getUTCHours() <= 7)) || env.DEV === "true")) {
 		items.push(
 			...await fetch(
 				"https://www.googleapis.com/youtube/v3/search" +
@@ -141,7 +141,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		console.error("No items in ", JSON.stringify(liveData, null, '\t'));
 	}
 
-	if(liveCount != items.length) {
+	if(liveCount != (items ?? []).length) {
 		// if api response doesn't match livecount, retry again in 5 seconds
 		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
 	}
