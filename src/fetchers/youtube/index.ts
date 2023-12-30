@@ -121,7 +121,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		console.error("No items in ", JSON.stringify(liveData, null, '\t'));
 	}
 
-	if(liveCount != items?.length) {
+	if(liveCount != items.length) {
 		// if api response doesn't match livecount, retry again in 5 seconds
 		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
 	}
