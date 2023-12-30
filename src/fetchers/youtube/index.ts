@@ -111,7 +111,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		"&maxResults=50" +
 		"&order=date" +
 		"&type=video" +
-		"&eventType=live,upcoming" +
+		"&eventType=live" +
 		"&date=" + Date.now() +
 		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
