@@ -117,6 +117,26 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	).then(r => r.json()) as any;
 
 	const items = liveData?.items;
+
+	const now = new Date();
+	if(items && items.length == 0 && now.getDay() >= 5 && (now.getUTCHours() === 11 || now.getUTCHours() <= 7)) {
+		items.push(
+			...await fetch(
+				"https://www.googleapis.com/youtube/v3/search" +
+				"?part=snippet" +
+				"&channelId=" + CHANNEL +
+				"&maxResults=50" +
+				"&order=date" +
+				"&type=video" +
+				"&eventType=upcoming" +
+				"&date=" + Date.now() +
+				"&key=" + getKey(env)
+			)
+				.then(r => r.json() as any)
+				.then(r => r.items as any[])
+		)
+	}
+
 	if(!items || items.length < 1) {
 		console.error("No items in ", JSON.stringify(liveData, null, '\t'));
 	}
