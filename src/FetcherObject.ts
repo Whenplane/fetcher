@@ -22,7 +22,7 @@ export class FetcherObject {
 			return Response.json(
 				{
 					liveCount: await getLiveCount(this.state, this.env),
-					lastCount: await get(this.state, "lastcount")
+					lastCount: await get(this.state, "lastcounts")
 				}
 			)
 		} else if(url.pathname === "/listList") {

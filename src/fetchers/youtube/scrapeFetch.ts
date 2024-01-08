@@ -3,12 +3,12 @@ import { Env } from '../../worker';
 import { get, put } from '../../storageCacher';
 
 const COUNT_LASTFETCH = "scrape_livecount:last-fetch";
-const COUNT_VALUE = "scrape_livecount:count";
+const COUNT_VALUE = "scrape_livecount:counts";
 
-export async function getLiveCount(state: DurableObjectState, env: Env) {
+export async function getLiveCount(state: DurableObjectState, env: Env): Promise<LiveCountObj> {
 	const lastFetch: number = (await get(state, COUNT_LASTFETCH)) || 0;
-	if(Date.now() - lastFetch < 4750) { // cache for 5 seconds
-		return (await get(state, COUNT_VALUE) as number) || 0;
+	if(Date.now() - lastFetch < 4000) { // cache for 4 seconds
+		return (await get(state, COUNT_VALUE) as LiveCountObj) || {live: 0, upcoming: 0};
 	}
 	put(state, COUNT_LASTFETCH, Date.now());
 
@@ -20,7 +20,7 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 	// If the response is invalid, return the cached value
 	const isInvalidResponse = pageData.includes("This page checks");
 	if(isInvalidResponse) {
-		return (await get(state, COUNT_VALUE) as number) || 0
+		return (await get(state, COUNT_VALUE) as LiveCountObj) || {live: 0, upcoming: 0}
 	}
 
 	if(
@@ -58,7 +58,14 @@ export async function getLiveCount(state: DurableObjectState, env: Env) {
 		})());
 	}
 
-	v(put(state, COUNT_VALUE, liveCount));
+	const obj = {live: liveCount, upcoming: upcomingCount};
 
-	return liveCount;
+	v(put(state, COUNT_VALUE, obj));
+
+	return obj;
+}
+
+export type LiveCountObj = {
+	live: number,
+	upcoming: number
 }

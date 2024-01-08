@@ -1,28 +1,31 @@
-import { getLiveCount } from './scrapeFetch';
+import { getLiveCount, LiveCountObj } from './scrapeFetch';
 import { Env } from '../../worker';
 import { getSpecificData } from './specificData';
 import { get, put } from '../../storageCacher';
 
-export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw";
+export const CHANNEL = /*"UCXuqSBlHAE6Xw-yeJA0Tunw"; //*/ "UCo3FWW9tL-j5uIFVK8J7IEg"
 
 const LIST_LASTFETCH = "api_list:lastfetch";
 const LIST_VALUE = "api_list:list";
-const LASTCOUNT = "lastcount";
+const LASTCOUNT = "lastcounts";
 
 let lastUpcomingSend = 0;
 
 export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
-	const liveCount = getLiveCount(state, env);
 	const items = await getLiveList(state, env);
 
+	let isLive = false;
 	let isWAN;
 	let videoId;
 
 	for (const item of (items ?? [])) {
-		isWAN = item.snippet.title.includes("WAN");
-		videoId = item.id?.videoId
-		if(isWAN) break;
+		if(!isWAN) {
+			isWAN = item.snippet.title.includes("WAN");
+			videoId = item.id?.videoId;
+		}
+		console.log(item.snippet.liveBroadcastContent)
+		if(!isLive) isLive = item.snippet.liveBroadcastContent === "live";
 	}
 
 	let started;
@@ -32,10 +35,12 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
 	if(isWAN) {
 		const specificData = await getSpecificData(state, videoId, env);
-		if(specificData.items && specificData.items[0]) {
-			started = specificData.items[0].liveStreamingDetails?.actualStartTime;
-			snippet = specificData.items[0].snippet;
-			upcoming = specificData.items[0].snippet?.liveBroadcastContent === "upcoming";
+		const item = specificData.items?.[0]
+		if(item) {
+			started = item.liveStreamingDetails?.actualStartTime;
+			snippet = item.snippet;
+			upcoming = item.snippet?.liveBroadcastContent === "upcoming";
+			if(!isLive) isLive = item.snippet.liveBroadcastContent === "live";
 		} else {
 			console.log(specificData)
 		}
@@ -73,33 +78,40 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 	return {
 		isWAN,
 		videoId,
-		isLive: ((await liveCount) > 0) && !upcoming,
+		isLive,
 		started,
 		snippet,
-		upcoming
+		upcoming,
+		count: items?.length ?? "undefined"
 	}
 }
 
 export async function getLiveList(state: DurableObjectState, env: Env) {
+	console.log("1")
 	const lastFetch: number = (await get(state, LIST_LASTFETCH)) || 0;
 	const liveCount = await getLiveCount(state, env);
-	const lastCount = (await get(state, LASTCOUNT) as number) || 0;
+	const lastCount: LiveCountObj = (await get(state, LASTCOUNT) as LiveCountObj) || {live: 0, upcoming: 0};
 
 	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
-	const cacheTime = (liveCount > 1 || lastCount > 1) ? (5 * 60e3) : (10 * 60e3);
+	const cacheTime = (liveCount.live > 1 || lastCount.live > 1) ? (5 * 60e3) : (10 * 60e3);
 
 	if(
 		Date.now() - lastFetch < cacheTime &&
 		// skip cache if number of livestreams changes (usually happens when WAN starts or ends)
-		liveCount == lastCount
+		liveCount.live     == lastCount.live     &&
+		liveCount.upcoming == lastCount.upcoming &&
+		await get(state, LIST_VALUE)
 	) {
+		console.log("2")
 		return await get(state, LIST_VALUE);
-	} else if(liveCount != lastCount) {
+	} else if(liveCount.live != lastCount.live || liveCount.upcoming != lastCount.upcoming) {
+		console.log("3")
 		// wait 5 seconds before expiring cache to allow Google's cache to calm down
-		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
+		await put(state, LIST_LASTFETCH, (Date.now() - cacheTime) + 5e3);
 		await put(state, LASTCOUNT, liveCount);
 		return await get(state, LIST_VALUE);
 	}
+	console.log("4")
 
 	v(put(state, LIST_LASTFETCH, Date.now()));
 	v(put(state, LASTCOUNT, liveCount));
@@ -117,33 +129,37 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	).then(r => r.json()) as any;
 
 	const items = liveData?.items;
+	let upcomingItems = [];
+
+	if(!items) {
+		console.log("Missing items!", liveData)
+	}
 
 	const now = new Date();
 	if(items && items.length == 0 && ((now.getDay() >= 5 && (now.getUTCHours() === 11 || now.getUTCHours() <= 7)) || env.DEV === "true")) {
-		items.push(
-			...await fetch(
-				"https://www.googleapis.com/youtube/v3/search" +
-				"?part=snippet" +
-				"&channelId=" + CHANNEL +
-				"&maxResults=50" +
-				"&order=date" +
-				"&type=video" +
-				"&eventType=upcoming" +
-				"&date=" + Date.now() +
-				"&key=" + getKey(env)
-			)
-				.then(r => r.json() as any)
-				.then(r => r.items as any[])
+		upcomingItems = await fetch(
+			"https://www.googleapis.com/youtube/v3/search" +
+			"?part=snippet" +
+			"&channelId=" + CHANNEL +
+			"&maxResults=50" +
+			"&order=date" +
+			"&type=video" +
+			"&eventType=upcoming" +
+			"&date=" + Date.now() +
+			"&key=" + getKey(env)
 		)
+			.then(r => r.json() as any)
+			.then(r => r.items as any[]);
+		items.push(...upcomingItems);
 	}
 
 	if(!items || items.length < 1) {
 		console.error("No items in ", JSON.stringify(liveData, null, '\t'));
 	}
 
-	if(liveCount != (items ?? []).length) {
+	if(liveCount.live != (items ?? []).length || liveCount.upcoming != (upcomingItems ?? []).length) {
 		// if api response doesn't match livecount, retry again in 5 seconds
-		await put(state, LIST_LASTFETCH, Date.now() - cacheTime - 5e3);
+		await put(state, LIST_LASTFETCH, (Date.now() - cacheTime) + 5e3);
 	}
 
 	put(state, LIST_VALUE, items);
