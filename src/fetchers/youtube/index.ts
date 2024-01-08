@@ -3,7 +3,7 @@ import { Env } from '../../worker';
 import { getSpecificData } from './specificData';
 import { get, put } from '../../storageCacher';
 
-export const CHANNEL = /*"UCXuqSBlHAE6Xw-yeJA0Tunw"; //*/ "UCo3FWW9tL-j5uIFVK8J7IEg"
+export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw"; // "UCo3FWW9tL-j5uIFVK8J7IEg"
 
 const LIST_LASTFETCH = "api_list:lastfetch";
 const LIST_VALUE = "api_list:list";
