@@ -93,7 +93,12 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	const lastCount: LiveCountObj = (await get(state, LASTCOUNT) as LiveCountObj) || {live: 0, upcoming: 0};
 
 	// When there are 2+ livestreams (good chance the latter is WAN), update every 5 minutes. Otherwise, every 10 mins.
-	const cacheTime = (liveCount.live > 1 || lastCount.live > 1) ? (5 * 60e3) : (10 * 60e3);
+	let cacheTime = (liveCount.live > 1 || lastCount.live > 1) ? (5 * 60e3) : (10 * 60e3);
+
+	const now = new Date();
+	if(now.getUTCMonth() === 0 && now.getUTCDate() && now.getUTCMinutes() == 37 && now.getUTCSeconds() == 0) {
+		cacheTime = 2e3;
+	}
 
 	if(
 		Date.now() - lastFetch < cacheTime &&
@@ -135,7 +140,7 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		console.log("Missing items!", liveData)
 	}
 
-	const now = new Date();
+
 	if(items && items.length == 0 && ((now.getDay() >= 5 && (now.getUTCHours() === 11 || now.getUTCHours() <= 7)) || env.DEV === "true")) {
 		upcomingItems = await fetch(
 			"https://www.googleapis.com/youtube/v3/search" +
