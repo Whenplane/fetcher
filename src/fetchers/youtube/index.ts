@@ -96,9 +96,9 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 	let cacheTime = (liveCount.live > 1 || lastCount.live > 1) ? (5 * 60e3) : (10 * 60e3);
 
 	const now = new Date();
-	if(now.getUTCMonth() === 0 && now.getUTCDate() == 12 && now.getUTCMinutes() == 40 && now.getUTCSeconds() <= 15) {
+	/*if(now.getUTCMonth() === 0 && now.getUTCDate() == 12 && now.getUTCMinutes() == 40 && now.getUTCSeconds() <= 15) {
 		cacheTime = 15e3;
-	}
+	}*/
 
 	if(
 		Date.now() - lastFetch < cacheTime &&
