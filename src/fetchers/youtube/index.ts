@@ -39,7 +39,7 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 		if(item) {
 			started = item.liveStreamingDetails?.actualStartTime;
 			snippet = item.snippet;
-			upcoming = item.snippet?.liveBroadcastContent === "upcoming";
+			upcoming = item.snippet?.liveBroadcastContent === "upcoming" && !isLive;
 			if(!isLive) isLive = item.snippet.liveBroadcastContent === "live";
 		} else {
 			console.log(specificData)
