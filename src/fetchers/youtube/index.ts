@@ -100,23 +100,35 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		cacheTime = 15e3;
 	}*/
 
+	const cachedValue = await get(state, LIST_VALUE) as any[] ?? [];
+
+	for (let item of cachedValue) {
+		if(!item.snippet.title.includes("WAN")) continue;
+		if(item.snippet.liveBroadcastContent !== "live") break;
+		if(!item.liveStreamingDetails?.actualStartTime) {
+			// wtf youtube why do you make me do this
+			cacheTime = 10e3; // if the stream is live but there is no start time, try again in 10 seconds.
+		}
+	}
+
 	if(
 		Date.now() - lastFetch < cacheTime &&
 		// skip cache if number of livestreams changes (usually happens when WAN starts or ends)
 		liveCount.live     == lastCount.live     &&
 		liveCount.upcoming == lastCount.upcoming &&
-		await get(state, LIST_VALUE)
+		cachedValue
 	) {
-		console.log("2")
-		return await get(state, LIST_VALUE);
+
+		return cachedValue;
+
 	} else if(liveCount.live != lastCount.live || liveCount.upcoming != lastCount.upcoming) {
-		console.log("3")
+
 		// wait 5 seconds before expiring cache to allow Google's cache to calm down
 		await put(state, LIST_LASTFETCH, (Date.now() - cacheTime) + 5e3);
 		await put(state, LASTCOUNT, liveCount);
-		return await get(state, LIST_VALUE);
+		return cachedValue;
+
 	}
-	console.log("4")
 
 	v(put(state, LIST_LASTFETCH, Date.now()));
 	v(put(state, LASTCOUNT, liveCount));
