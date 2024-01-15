@@ -87,7 +87,6 @@ export async function getLiveInfo(state: DurableObjectState, env: Env) {
 }
 
 export async function getLiveList(state: DurableObjectState, env: Env) {
-	console.log("1")
 	const lastFetch: number = (await get(state, LIST_LASTFETCH)) || 0;
 	const liveCount = await getLiveCount(state, env);
 	const lastCount: LiveCountObj = (await get(state, LASTCOUNT) as LiveCountObj) || {live: 0, upcoming: 0};
