@@ -10,6 +10,7 @@ const LIST_VALUE = "api_list:list";
 const LASTCOUNT = "lastcounts";
 
 let lastUpcomingSend = 0;
+let lastMissingStartTimeSend = 0;
 
 export async function getLiveInfo(state: DurableObjectState, env: Env) {
 
@@ -102,6 +103,36 @@ export async function getLiveList(state: DurableObjectState, env: Env) {
 		if(!item.liveStreamingDetails?.actualStartTime) {
 			// wtf youtube why do you make me do this
 			cacheTime = 10e3; // if the stream is live but there is no start time, try again in 10 seconds.
+
+			// send an alert if this happens with the data
+			if(env.DISCORD_WEBHOOK && Date.now() - lastMissingStartTimeSend > 10e3) { // limit to one message every 10 seconds
+				v((async () => {
+					if(!env.DISCORD_WEBHOOK) return;
+
+					const formData = new FormData();
+
+					formData.append("payload_json", JSON.stringify(
+						{
+							content: `Missing actualStartTime`
+						}
+					));
+
+					formData.append(
+						"files[0]",
+						new Blob(
+							[JSON.stringify(cachedValue, undefined, '\t')],
+							{type: 'application/json'}
+						),
+						"items.json"
+					)
+
+					await fetch(env.DISCORD_WEBHOOK, {
+						method: "POST",
+						body: formData,
+					})
+					lastMissingStartTimeSend = Date.now();
+				})())
+			}
 		}
 	}
 
