@@ -32,7 +32,7 @@ export async function get<Type>(state: DurableObjectState, key: string) {
 const CACHE_TTL = 60 * 60e3; // one hour
 
 export async function put(state: DurableObjectState, key: string, value: unknown) {
-	if(cache[key].value === value) {
+	if(JSON.stringify(cache[key].value) === JSON.stringify(value)) {
 		cache[key].expires = Date.now() + CACHE_TTL;
 		return;
 	}
