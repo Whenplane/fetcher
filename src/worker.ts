@@ -16,7 +16,9 @@ export interface Env {
 	YOUTUBE_KEY_2?: string
 	YOUTUBE_KEY_3?: string
 	YOUTUBE_KEY_DO?: string
-	DISCORD_WEBHOOK?: string
+	DISCORD_WEBHOOK?: string,
+
+	DURABLE_STORAGE_ANALYTICS: AnalyticsEngineDataset,
 
 	// set to bypass ip check in dev
 	DEV?: string

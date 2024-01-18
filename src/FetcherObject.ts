@@ -1,15 +1,17 @@
 import { Env } from './worker';
 import { getLiveInfo, getLiveList } from './fetchers/youtube';
 import { getLiveCount } from './fetchers/youtube/scrapeFetch';
-import { get } from './storageCacher';
+import { get, setWAEDataset } from './storageCacher';
 
 export class FetcherObject {
 	state: DurableObjectState
 	env: Env
 
 	constructor(state: DurableObjectState, env: Env) {
-		this.state = state
-		this.env = env
+		this.state = state;
+		this.env = env;
+
+		setWAEDataset(env.DURABLE_STORAGE_ANALYTICS);
 	}
 
 	async fetch(request: Request) {

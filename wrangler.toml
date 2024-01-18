@@ -21,4 +21,8 @@ class_name = "FetcherObject"
 tag = "v1" # Should be unique for each entry
 new_classes = ["FetcherObject"]
 
+[[analytics_engine_datasets]]
+binding = "DURABLE_STORAGE_ANALYTICS"
+dataset = "durable_storage_analytics"
+
 
