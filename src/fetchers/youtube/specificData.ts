@@ -16,6 +16,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 	let cacheTime = 15 * 60e3;
 
 	if(cachedValue) {
+		console.log({cachedValue})
 		for (let item of cachedValue) {
 			if(!item.snippet.title.includes("WAN")) continue;
 			// if(item.snippet.liveBroadcastContent !== "live") break;
