@@ -11,7 +11,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 
 	const lastFetch: number = (await get(state, LASTFETCH)) || 0;
 
-	const cachedValue = await get(state, LASTDATA);
+	const cachedValue: any = await get(state, LASTDATA);
 
 	let cacheTime = 15 * 60e3;
 
