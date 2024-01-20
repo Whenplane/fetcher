@@ -73,6 +73,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 		"&key=" + getKey(env)
 	).then(r => r.json()) as any;
 
+	console.log("Putting", specificData)
 	put(state, LASTDATA, specificData);
 
 	return specificData;
