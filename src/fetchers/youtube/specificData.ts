@@ -17,7 +17,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 
 	for (let item of cachedValue) {
 		if(!item.snippet.title.includes("WAN")) continue;
-		if(item.snippet.liveBroadcastContent !== "live") break;
+		// if(item.snippet.liveBroadcastContent !== "live") break;
 		if(!item.liveStreamingDetails?.actualStartTime) {
 			// wtf youtube why do you make me do this
 			cacheTime = 10e3; // if the stream is live but there is no start time, try again in 10 seconds.
