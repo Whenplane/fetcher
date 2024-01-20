@@ -6,8 +6,8 @@ import { get, put } from '../../storageCacher';
 let lastMissingStartTimeSend = 0;
 
 export async function getSpecificData(state: DurableObjectState, id: string, env: Env) {
-	const LASTFETCH = "api_specific:" + id + ":lastFetch";
-	const LASTDATA = "api_specific:" + id + ":data";
+	const LASTFETCH = "api_specific_2:" + id + ":lastFetch";
+	const LASTDATA = "api_specific_2:" + id + ":data";
 
 	const lastFetch: number = (await get(state, LASTFETCH)) || 0;
 
