@@ -33,7 +33,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 
 						formData.append("payload_json", JSON.stringify(
 							{
-								content: `Missing actualStartTime`
+								content: `Missing actualStartTime (in specific)`
 							}
 						));
 
