@@ -1,13 +1,18 @@
 import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 import { get, put } from '../../storageCacher';
+import { isNearWan } from "whenplane/src/lib/timeUtils";
 
 const COUNT_LASTFETCH = "scrape_livecount:last-fetch";
 const COUNT_VALUE = "scrape_livecount:counts";
 
 export async function getLiveCount(state: DurableObjectState, env: Env): Promise<LiveCountObj> {
+
+	const cache_time = isNearWan() ? 4000 : 60e3;
+
 	const lastFetch: number = (await get(state, COUNT_LASTFETCH)) || 0;
-	if(Date.now() - lastFetch < 4000) { // cache for 4 seconds
+
+	if(Date.now() - lastFetch < cache_time) { // cache for 4 seconds
 		return (await get(state, COUNT_VALUE) as LiveCountObj) || {live: 0, upcoming: 0};
 	}
 	put(state, COUNT_LASTFETCH, Date.now());
