@@ -41,7 +41,7 @@ export default {
 		}
 		const lastRequest = rateLimit[connectingIp] || 0;
 
-		if(Date.now() - lastRequest < 500) {
+		if(Date.now() - lastRequest < 2e3) {
 			return Response.json({message: "Too many requests! Slow down!"}, {status: 429});
 		}
 
