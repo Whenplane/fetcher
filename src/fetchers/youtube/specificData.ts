@@ -15,7 +15,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 
 	let cacheTime = 15 * 60e3;
 
-	if(cachedValue) {
+	if(cachedValue && typeof cachedValue.items === "object") {
 		console.log(JSON.stringify(cachedValue, undefined, '\t'))
 		for (let item of cachedValue.items) {
 			if(!item.snippet.title.includes("WAN")) continue;
