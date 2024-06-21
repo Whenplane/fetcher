@@ -58,7 +58,7 @@ export async function getSpecificData(state: DurableObjectState, id: string, env
 	}
 
 
-	if(Date.now() - lastFetch < cacheTime) {
+	if(Date.now() - lastFetch < cacheTime && cachedValue) {
 		return cachedValue;
 	}
 
