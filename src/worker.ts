@@ -15,6 +15,8 @@ export interface Env {
 	YOUTUBE_KEY: string
 	YOUTUBE_KEY_2?: string
 	YOUTUBE_KEY_3?: string
+	YOUTUBE_KEY_4?: string
+	YOUTUBE_KEY_5?: string
 	YOUTUBE_KEY_DO?: string
 	DISCORD_WEBHOOK?: string,
 
