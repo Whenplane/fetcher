@@ -12,6 +12,6 @@
     "wrangler": "^3.0.0"
   },
 	"dependencies": {
-		"whenplane": "github:ajgeiss0702/whenplane"
+		"whenplane": "github:whenplane/whenplane"
 	}
 }

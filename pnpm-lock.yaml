@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       whenplane:
-        specifier: github:ajgeiss0702/whenplane
-        version: wheniswan@https://codeload.github.com/ajgeiss0702/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29
+        specifier: github:whenplane/whenplane
+        version: wheniswan@https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20230419.0
@@ -681,8 +681,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  wheniswan@https://codeload.github.com/ajgeiss0702/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29:
-    resolution: {tarball: https://codeload.github.com/ajgeiss0702/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29}
+  wheniswan@https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29:
+    resolution: {tarball: https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29}
     name: wheniswan
     version: 0.0.1
 
@@ -1354,7 +1354,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  wheniswan@https://codeload.github.com/ajgeiss0702/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29:
+  wheniswan@https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29:
     dependencies:
       '@dimfeld/svelte-lazyload': 0.0.4
       '@floating-ui/dom': 1.5.4
