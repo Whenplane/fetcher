@@ -176,11 +176,11 @@ export function getKey(env: Env) {
 
 	const keys = [
 		env.YOUTUBE_KEY_DO,
-		env.YOUTUBE_KEY,
+		/*env.YOUTUBE_KEY,
 		env.YOUTUBE_KEY_2,
 		env.YOUTUBE_KEY_3,
 		env.YOUTUBE_KEY_4,
-		env.YOUTUBE_KEY_5
+		env.YOUTUBE_KEY_5*/
 	]
 	if(typeof keyIndex == 'undefined') keyIndex = Math.floor(Math.random() * keys.length);
 
