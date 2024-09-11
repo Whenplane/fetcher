@@ -7,6 +7,8 @@ import { get, put } from '../../storageCacher';
 let startRetryCount = 0;
 let lastMissingStartTimeSend = 0;
 
+let startingSoonCount = 0;
+
 const quickLastFetch: {[id: string]: number} = {}
 
 export async function getSpecificDetails(state: DurableObjectState, env: Env, id: string) {
@@ -55,6 +57,14 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 						})
 						lastMissingStartTimeSend = Date.now();
 					})())
+				}
+			}
+
+			// auto cache expiry if the stream is supposed to be starting soon
+			if(item.snippet.liveBroadcastContent === "upcoming" && item.liveStreamingDetails.scheduledStartTime) {
+				const scheduled = new Date(item.liveStreamingDetails.scheduledStartTime);
+				if(Date.now() - scheduled.getTime() < 10e3) {
+					cacheTime = 10e3 + (startingSoonCount++ * 1e3);
 				}
 			}
 		}
