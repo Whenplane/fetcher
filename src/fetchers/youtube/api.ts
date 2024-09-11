@@ -63,7 +63,9 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 			// auto cache expiry if the stream is supposed to be starting soon
 			if(item.snippet.liveBroadcastContent === "upcoming" && item.liveStreamingDetails.scheduledStartTime) {
 				const scheduled = new Date(item.liveStreamingDetails.scheduledStartTime);
-				if(Date.now() - scheduled.getTime() < 10e3) {
+				const timeUntilScheduledStart = scheduled.getTime() - Date.now();
+				if(timeUntilScheduledStart < 10e3) {
+					console.log("Stream is supposed to be starting soon! Lowering cache time")
 					cacheTime = 10e3 + (startingSoonCount++ * 1e3);
 				}
 			}
@@ -72,7 +74,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 
 	if(Date.now() - lastFetch < cacheTime && cachedValue) {
 		if(!cachedValue.items || cachedValue.items.length == 0) {
-			console.warn("No cached items for " + id + ": ", cachedValue)
+			console.warn("No cached items for " + id + ": ", JSON.stringify(cachedValue, undefined, '\t'))
 			return undefined;
 		} else {
 			return cachedValue.items[0];
@@ -88,7 +90,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 	v(put(state, LAST_DATA, data));
 
 	if(!data?.items || data.items.length == 0) {
-		console.warn("Got no items for " + id + ": ", data)
+		console.warn("Got no items for " + id + ": ", JSON.stringify(data, undefined, '\t'))
 		return undefined;
 	} else {
 		return data.items[0]
@@ -104,7 +106,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 
 
 async function realGetSpecificDetails(env: Env, id: string) {
-	if(!env.YOUTUBE_KEY) console.warn("Missing youtube key!")
+	if(!env.YOUTUBE_KEY) console.warn("Missing youtube key!");
 	return await fetch("https://www.googleapis.com/youtube/v3/videos" +
 		"?part=liveStreamingDetails,snippet" +
 		"&id=" + id +
