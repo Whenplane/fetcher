@@ -12,7 +12,7 @@ export { FetcherObject } from './FetcherObject'
 
 export interface Env {
 	WHENISWAN_FETCHER: DurableObjectNamespace,
-	YOUTUBE_KEY_DO?: string
+	YOUTUBE_KEY?: string, // currently using the wheniswan4 project
 	DISCORD_WEBHOOK?: string,
 
 	DURABLE_STORAGE_ANALYTICS: AnalyticsEngineDataset,
