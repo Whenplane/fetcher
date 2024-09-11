@@ -3,8 +3,8 @@ import { getLivestreamId } from './scrape';
 import { getSpecificDetails } from './api';
 
 
-// export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw"; // linus tech tips
-export const CHANNEL = "UCSJ4gkVC6NrvII8umztf0Ow" // lofi girl (for testing, since they're always live)
+export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw"; // linus tech tips
+// export const CHANNEL = "UCSJ4gkVC6NrvII8umztf0Ow" // lofi girl (for testing, since they're always live)
 
 export async function getData(state: DurableObjectState, env: Env) {
 	const videoId = await getLivestreamId();
