@@ -10,8 +10,8 @@ let lastMissingStartTimeSend = 0;
 const quickLastFetch: {[id: string]: number} = {}
 
 export async function getSpecificDetails(state: DurableObjectState, env: Env, id: string) {
-	const LAST_FETCH = "api_specific_2:" + id + ":lastFetch";
-	const LAST_DATA = "api_specific_2:" + id + ":data";
+	const LAST_FETCH = "api_specific_3:" + id + ":lastFetch";
+	const LAST_DATA = "api_specific_3:" + id + ":data";
 
 	// The max here is to pick the most recent date: the quick one that's set before the update, or the real one that's set after
 	const lastFetch: number = Math.max((await get(state, LAST_FETCH)) || 0, quickLastFetch[id] || 0);
@@ -62,6 +62,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 
 	if(Date.now() - lastFetch < cacheTime && cachedValue) {
 		if(!cachedValue.items || cachedValue.items.length == 0) {
+			console.warn("No cached items for " + id + ": ", cachedValue)
 			return undefined;
 		} else {
 			return cachedValue.items[0];
@@ -93,7 +94,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 
 
 async function realGetSpecificDetails(env: Env, id: string) {
-	if(!env.YOUTUBE_KEY_DO) console.warn("Missing youtube key!")
+	if(!env.YOUTUBE_KEY) console.warn("Missing youtube key!")
 	return await fetch("https://www.googleapis.com/youtube/v3/videos" +
 		"?part=liveStreamingDetails,snippet" +
 		"&id=" + id +
@@ -101,6 +102,6 @@ async function realGetSpecificDetails(env: Env, id: string) {
 		"&order=date" +
 		"&type=video" +
 		"&eventType=live,upcoming" +
-		"&key=" + env.YOUTUBE_KEY_DO
+		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json()) as SpecificResponse;
 }

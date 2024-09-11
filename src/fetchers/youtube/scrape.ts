@@ -1,10 +1,14 @@
-import { CHANNEL } from './index';
+import { CHANNEL, v } from './index';
+import { Env } from '../../worker';
 
 
 let lastIdFetch = 0;
 let lastId: string | undefined;
 
-export async function getLivestreamId() {
+let wEnv: Env;
+
+export async function getLivestreamId(env: Env) {
+	wEnv = env;
 	if(Date.now() - lastIdFetch < 5e3) {
 		return lastId;
 	}
@@ -18,8 +22,15 @@ export async function getLivestreamId() {
 
 
 async function realGetLivestreamId() {
-	const youtubeResponse = await fetch(`https://www.youtube.com/channel/${CHANNEL}/live`);
+	console.debug("Requesting livestream id for " + CHANNEL)
+	const youtubeResponse = await fetch(`https://www.youtube.com/channel/${CHANNEL}/live`, {
+		headers: {
+			"User-Agent": "Mozilla/5.0 (compatible; Whenplane-lttstore-watcher/0.0.0; +https://whenplane.com/fetcher-info)"
+		}
+	});
 	const canonical = await getCanonical(youtubeResponse);
+
+	console.debug("Got canonical", canonical, "for", CHANNEL)
 
 	if(!canonical || canonical.includes("/channel/")) {
 		return undefined;
@@ -42,8 +53,53 @@ async function getCanonical(res: Response) {
 
 	const matches = canonicalRegex.exec(text);
 
-	if(matches == null) return null;
-	if(matches.length < 2) return null;
+	if(matches == null) {
+		console.warn("matches is null!")
+		sendBody(text)
+		return null;
+	}
+	if(matches.length < 2) {
+		console.log("Matches is too short!")
+		sendBody(text)
+		return null;
+	}
 
 	return matches[1];
+}
+
+function sendBody(body: string) {
+	v((async () => {
+		console.log("hello?")
+		if(!wEnv.DISCORD_WEBHOOK) {
+			console.warn("missing webhook!");
+			return;
+		}
+		console.log("pre-upload")
+		const response = await fetch("https://bytebin.ajg0702.us/post", {
+			method: "POST",
+			headers: {
+				"Content-Type": "text/plain"
+			},
+			body: body
+		});
+
+		if(response.status != 201) {
+			console.error("bytebin returned invalid response code!" + await response.text());
+			return;
+		}
+
+		console.debug("uploaded")
+
+		const json: any = await response.json();
+
+		await fetch(wEnv.DISCORD_WEBHOOK, {
+			method: "POST",
+			body: JSON.stringify(
+				{
+					content: "Missing canonical! https://paste.ajg0702.us/" + json.key
+				}
+			),
+			headers: {"content-type": "application/json"}
+		})
+	})());
 }
