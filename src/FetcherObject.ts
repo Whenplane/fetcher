@@ -1,7 +1,6 @@
 import { Env } from './worker';
-import { getLiveInfo, getLiveList } from './fetchers/youtube';
-import { getLiveCount } from './fetchers/youtube/scrapeFetch';
 import { get, setWAEDataset } from './storageCacher';
+import { getData } from './fetchers/youtube';
 
 export class FetcherObject {
 	state: DurableObjectState
@@ -16,21 +15,15 @@ export class FetcherObject {
 
 	async fetch(request: Request) {
 		const url = new URL(request.url);
+
+		if(this.env.DEV && url.pathname === "/testNew") {
+			return Response.json(await getData(this.state, this.env))
+		}
+
 		if(url.pathname === "/youtube") {
 			return Response.json(
-				await getLiveInfo(this.state, this.env)
+				await getData(this.state, this.env)
 			)
-		} else if(url.pathname === "/liveCount") {
-			return Response.json(
-				{
-					liveCount: await getLiveCount(this.state, this.env),
-					lastCount: await get(this.state, "lastcounts")
-				}
-			)
-		} else if(url.pathname === "/listList") {
-			return Response.json({
-				list: await getLiveList(this.state, this.env)
-			});
 		}
 		return Response.json({message: "not found"}, {status: 404})
 	}

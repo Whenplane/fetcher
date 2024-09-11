@@ -683,7 +683,6 @@ packages:
 
   wheniswan@https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29:
     resolution: {tarball: https://codeload.github.com/whenplane/whenplane/tar.gz/56e4074db0d1f26f689182166a9d856734b01a29}
-    name: wheniswan
     version: 0.0.1
 
   workerd@1.20230710.0:

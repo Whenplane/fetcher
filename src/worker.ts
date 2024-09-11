@@ -12,11 +12,6 @@ export { FetcherObject } from './FetcherObject'
 
 export interface Env {
 	WHENISWAN_FETCHER: DurableObjectNamespace,
-	YOUTUBE_KEY: string
-	YOUTUBE_KEY_2?: string
-	YOUTUBE_KEY_3?: string
-	YOUTUBE_KEY_4?: string
-	YOUTUBE_KEY_5?: string
 	YOUTUBE_KEY_DO?: string
 	DISCORD_WEBHOOK?: string,
 
@@ -47,7 +42,9 @@ export default {
 			return Response.json({message: "Too many requests! Slow down!"}, {status: 429});
 		}
 
-		const youtube = new URL(request.url).searchParams.has("youtube")
+		const url = new URL(request.url);
+
+		const youtube = url.searchParams.has("youtube")
 
 		const id = env.WHENISWAN_FETCHER.idFromName(youtube ? "youtube" : "dev");
 		const stub = env.WHENISWAN_FETCHER.get(id);
