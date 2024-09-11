@@ -76,7 +76,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 	v(put(state, LAST_FETCH, Date.now()));
 	v(put(state, LAST_DATA, data));
 
-	if(data?.items && data.items.length == 0) {
+	if(!data?.items || data.items.length == 0) {
 		console.warn("Got no items for " + id + ": ", data)
 		return undefined;
 	} else {
