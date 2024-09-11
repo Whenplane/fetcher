@@ -32,6 +32,7 @@ async function realGetLivestreamId() {
 
 	console.debug("Got canonical", canonical, "for", CHANNEL)
 
+	// if the canonical for the `/live` page is the channel, then there is no livestream. if its a video link, then there is
 	if(!canonical || canonical.includes("/channel/")) {
 		return undefined;
 	}
