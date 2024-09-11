@@ -69,12 +69,10 @@ async function getCanonical(res: Response) {
 
 function sendBody(body: string) {
 	v((async () => {
-		console.log("hello?")
 		if(!wEnv.DISCORD_WEBHOOK) {
 			console.warn("missing webhook!");
 			return;
 		}
-		console.log("pre-upload")
 		const response = await fetch("https://bytebin.ajg0702.us/post", {
 			method: "POST",
 			headers: {
@@ -88,7 +86,6 @@ function sendBody(body: string) {
 			return;
 		}
 
-		console.debug("uploaded")
 
 		const json: any = await response.json();
 
