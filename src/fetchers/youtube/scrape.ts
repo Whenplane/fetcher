@@ -9,7 +9,7 @@ let wEnv: Env;
 
 export async function getLivestreamId(env: Env) {
 	wEnv = env;
-	if(Date.now() - lastIdFetch < 5e3) {
+	if(Date.now() - lastIdFetch < 10e3) {
 		return lastId;
 	}
 
