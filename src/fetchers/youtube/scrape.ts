@@ -23,7 +23,7 @@ export async function getLivestreamId(env: Env) {
 
 async function realGetLivestreamId() {
 	console.debug("Requesting livestream id for " + CHANNEL)
-	const youtubeResponse = await fetch(`https://www.youtube.com/channel/${CHANNEL}/live`, {
+	const youtubeResponse = await fetch(`https://www.youtube.com/channel/${CHANNEL}/live?d=` + Date.now(), {
 		headers: {
 			"User-Agent": "Mozilla/5.0 (compatible; Whenplane-fetcher/0.0.0; +https://whenplane.com/fetcher-info)"
 		}
