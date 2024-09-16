@@ -12,13 +12,15 @@ let wEnv: Env;
 
 export async function getLivestreamId(env: Env) {
 	wEnv = env;
-	let cacheTime = isNearWan() ? 10e3 : 60e3;
-	if(Date.now() - lastIdFetch < cacheTime) {
-		return lastId;
+	const nearWan = isNearWan();
+	let cacheTime = nearWan ? 10e3 : 60e3;
+
+	// If they have been live recently, dont update as often
+	if(nearWan && Date.now() - lastHadId < 60 * 60e3) {
+		cacheTime = 60e3;
 	}
 
-	// If we have an id (they are live) then dont update as often (only once per minute)
-	if(Date.now() - lastHadId < 60e3) {
+	if(Date.now() - lastIdFetch < cacheTime) {
 		return lastId;
 	}
 
