@@ -7,6 +7,7 @@ let lastIdFetch = 0;
 let lastId: string | undefined;
 
 let lastHadId = 0;
+let lastNullCanonical = 0;
 
 let wEnv: Env;
 
@@ -21,6 +22,11 @@ export async function getLivestreamId(env: Env) {
 	}
 
 	if(Date.now() - lastIdFetch < cacheTime) {
+		return lastId;
+	}
+
+	// if we've gotten a null canonical (caused by captcha) in the past 10 minutes, hold off on updating
+	if(Date.now() - lastNullCanonical < 10 * 60e3) {
 		return lastId;
 	}
 
@@ -59,6 +65,9 @@ async function realGetLivestreamId() {
 
 	// if the canonical for the `/live` page is the channel, then there is no livestream. if its a video link, then there is
 	if(!canonical || canonical.includes("/channel/")) {
+		if(!canonical) {
+			lastNullCanonical = Date.now();
+		}
 		return undefined;
 	}
 
