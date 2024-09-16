@@ -1,15 +1,24 @@
 import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
+import { isNearWan } from '../../utils';
 
 
 let lastIdFetch = 0;
 let lastId: string | undefined;
 
+let lastHadId = 0;
+
 let wEnv: Env;
 
 export async function getLivestreamId(env: Env) {
 	wEnv = env;
-	if(Date.now() - lastIdFetch < 10e3) {
+	let cacheTime = isNearWan() ? 10e3 : 30e3;
+	if(Date.now() - lastIdFetch < cacheTime) {
+		return lastId;
+	}
+
+	// If we have an id (they are live) then dont update as often (only once per minute)
+	if(Date.now() - lastHadId < 60e3) {
 		return lastId;
 	}
 
@@ -57,6 +66,8 @@ async function realGetLivestreamId() {
 		console.warn("Canonical is not the channel but doesnt have v!", canonical);
 		return undefined;
 	}
+
+	lastHadId = Date.now();
 
 	return v;
 }
