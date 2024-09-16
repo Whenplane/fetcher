@@ -22,8 +22,22 @@ export async function getLivestreamId(env: Env) {
 
 
 async function realGetLivestreamId() {
-	console.debug("Requesting livestream id for " + CHANNEL)
-	const youtubeResponse = await fetch(`https://www.youtube.com/channel/${CHANNEL}/live?d=` + Date.now(), {
+	console.debug("Requesting livestream id for " + CHANNEL);
+	let url = `https://www.youtube.com/channel/${CHANNEL}/live`;
+	if(CHANNEL === "UCXuqSBlHAE6Xw-yeJA0Tunw") {
+		const random = Math.floor(3 * Math.random());
+		// 0 means keep channel id url
+		if(random === 1) {
+			url = "https://www.youtube.com/@linustechtips/live"
+		} else if(random === 2) {
+			url = "https://www.youtube.com/linustechtips/live"
+		} else if(random === 3) {
+			url = "https://www.youtube.com/c/linustechtips/live"
+		} else if(random === 4) {
+			url = "https://www.youtube.com/user/linustechtips/live"
+		}
+	}
+	const youtubeResponse = await fetch(url, {
 		headers: {
 			"User-Agent": "Mozilla/5.0 (compatible; Whenplane-fetcher/0.0.0; +https://whenplane.com/fetcher-info)"
 		}
