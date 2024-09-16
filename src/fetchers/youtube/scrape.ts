@@ -12,7 +12,7 @@ let wEnv: Env;
 
 export async function getLivestreamId(env: Env) {
 	wEnv = env;
-	let cacheTime = isNearWan() ? 10e3 : 30e3;
+	let cacheTime = isNearWan() ? 10e3 : 60e3;
 	if(Date.now() - lastIdFetch < cacheTime) {
 		return lastId;
 	}
