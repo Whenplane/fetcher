@@ -15,7 +15,7 @@ export async function getLivestreamId(env: Env) {
 
 	lastIdFetch = Date.now(); // do this here just in case something requests while below is executing
 	lastId = await realGetLivestreamId();
-	lastIdFetch = Date.now() + (10e3 * Math.random());
+	lastIdFetch = Date.now() + (30e3 * Math.random());
 
 	return lastId;
 }
