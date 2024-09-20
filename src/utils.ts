@@ -8,3 +8,10 @@ export function isNearWan(now?: Date) {
 		return false;
 	}
 }
+
+export function isNight(now?: Date) {
+	const d = now ? now : new Date();
+	let hours = d.getUTCHours() + 7;
+	if(hours >= 24) hours = hours - 24;
+	return hours < 7 || hours > 5;
+}

@@ -1,6 +1,6 @@
 import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
-import { isNearWan } from '../../utils';
+import { isNearWan, isNight } from '../../utils';
 
 
 let lastIdFetch = 0;
@@ -17,9 +17,11 @@ export async function getLivestreamId(env: Env) {
 	const nearWan = isNearWan();
 	let cacheTime = nearWan ? 10e3 : 60e3;
 
-	// If they have been live recently, dont update as often
+	if(!lastId && isNight()) cacheTime = 3 * 60 * 60e3; // only update once every 3 hours at night
+
+	// If they have been live recently, don't update as often
 	if(nearWan && Date.now() - lastHadId < 60 * 60e3) {
-		cacheTime = 60e3;
+		cacheTime = Math.max(cacheTime, 60e3);
 	}
 
 	if(Date.now() - lastIdFetch < cacheTime) {
