@@ -4,7 +4,7 @@ import { isNearWan, isNight } from '../../utils';
 
 
 let lastIdFetch = 0;
-let lastId: string | undefined;
+let lastId: string | undefined | null;
 
 let lastHadId = 0;
 let lastNullCanonical = 0;
@@ -20,7 +20,8 @@ export async function getLivestreamId(env: Env) {
 	if(!lastId && isNight()) cacheTime = 3 * 60 * 60e3; // only update once every 3 hours at night
 
 	// If they have been live recently, don't update as often
-	if(nearWan && Date.now() - lastHadId < 60 * 60e3) {
+	const wasLiveRecently = Date.now() - lastHadId < 60 * 60e3;
+	if(nearWan && wasLiveRecently) {
 		cacheTime = Math.max(cacheTime, 60e3);
 	}
 
@@ -28,13 +29,33 @@ export async function getLivestreamId(env: Env) {
 		return lastId;
 	}
 
+	if(!wasLiveRecently && nearWan && Math.random() < 0.75) {
+		// if they have not been live yet, but we are near wan, then 75% chance, check if floatplane is live. If it is, use proxy
+		const isFpLive = await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
+			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive);
+		if(isFpLive || env.DEV) {
+			console.log("Fetching canonical from proxy!")
+			lastIdFetch = Date.now();
+			lastId = await fetch("https://fp-proxy.ajg0702.us/youtube-canonical")
+				.then(r => r.json()).then(r => (r as {fetched: number, videoId: string | undefined}).videoId)
+			lastIdFetch = Date.now();
+			if(lastId) lastHadId = Date.now();
+			return lastId;
+		}
+	}
+
 	// if we've gotten a null canonical (caused by captcha) in the past 10 minutes, hold off on updating
 	if(Date.now() - lastNullCanonical < Math.min((10 * 60e3) * nullCount, 3 * 60 * 60e3)) {
 		return lastId;
 	}
 
+
+
 	lastIdFetch = Date.now(); // do this here just in case something requests while below is executing
-	lastId = await realGetLivestreamId();
+	const fetchedId = await realGetLivestreamId();
+	if(fetchedId !== null || !lastId) {
+		lastId = await realGetLivestreamId()
+	}
 	lastIdFetch = Date.now() + (Math.min(cacheTime, 2 * 60 * 60e3) * Math.random());
 
 	return lastId;
@@ -69,6 +90,7 @@ async function realGetLivestreamId() {
 	if(canonical == null) {
 		lastNullCanonical = Date.now();
 		nullCount++;
+		return null;
 	} else {
 		nullCount = 0;
 	}
