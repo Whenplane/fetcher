@@ -65,8 +65,9 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 				const scheduled = new Date(item.liveStreamingDetails.scheduledStartTime);
 				const timeUntilScheduledStart = scheduled.getTime() - Date.now();
 				if(timeUntilScheduledStart < 10e3) {
-					console.log("Stream is supposed to be starting soon! Lowering cache time")
-					cacheTime = 10e3 + (startingSoonCount++ * 1e3);
+					startingSoonCount++;
+					console.log("Stream is supposed to be starting soon! Lowering cache time to " + (10 + startingSoonCount))
+					cacheTime = 10e3 + (startingSoonCount * 1e3);
 				} else {
 					// only cache for 2 minutes when the stream is upcoming
 					cacheTime = 2 * 60e3;

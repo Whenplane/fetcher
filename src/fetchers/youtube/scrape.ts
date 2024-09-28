@@ -29,11 +29,11 @@ export async function getLivestreamId(env: Env) {
 		return lastId;
 	}
 
-	if(!wasLiveRecently && nearWan && Math.random() < 0.75) {
-		// if they have not been live yet, but we are near wan, then 75% chance, check if floatplane is live. If it is, use proxy
-		const isFpLive = await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
+	if(nearWan && Math.random() < 0.75) {
+		// if we are near wan, then 75% chance, check if floatplane is live. If it is, use proxy
+		const useProxy = wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
 			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive);
-		if(isFpLive || env.DEV) {
+		if(useProxy || env.DEV) {
 			console.log("Fetching canonical from proxy!")
 			lastIdFetch = Date.now();
 			lastId = await fetch("https://fp-proxy.ajg0702.us/youtube-canonical")
