@@ -29,6 +29,15 @@ export class FetcherObject {
 		if(url.pathname === "/youtube-callback") {
 			const body = request.method !== "GET" ? await request.text() : null;
 			console.log("Got youtube callback with method of " + request.method + " and body", body);
+			if(url.searchParams.has("hub.challenge")) {
+				const topic = url.searchParams.get("hub.topic");
+				const challenge = url.searchParams.get("hub.challenge");
+				if(topic === "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw") {
+					return new Response(challenge);
+				} else {
+					return new Response("Invalid topic!", {status: 400})
+				}
+			}
 			if(Date.now() - lastYoutubeCallback.date > 30e3) {
 				lastYoutubeCallback.date = Date.now();
 			} else {
