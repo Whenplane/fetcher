@@ -44,7 +44,7 @@ export default {
 
 		const url = new URL(request.url);
 
-		const youtube = url.searchParams.has("youtube")
+		const youtube = url.searchParams.has("youtube") || url.pathname === "/youtube-callback"
 
 		const id = env.WHENISWAN_FETCHER.idFromName(youtube ? "youtube" : "dev");
 		const stub = env.WHENISWAN_FETCHER.get(id);

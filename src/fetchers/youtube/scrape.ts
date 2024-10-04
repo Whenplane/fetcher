@@ -6,6 +6,9 @@ import { isNearWan, isNight } from '../../utils';
 let lastIdFetch = 0;
 let lastId: string | undefined | null;
 
+export let lastYoutubeCallback = {date: 0};
+let lastHandledYoutubeCallback = 0;
+
 let lastHadId = 0;
 let lastNullCanonical = 0;
 let nullCount = 0;
@@ -25,14 +28,24 @@ export async function getLivestreamId(env: Env) {
 		cacheTime = Math.max(cacheTime, 60e3);
 	}
 
+	if(lastYoutubeCallback.date !== lastHandledYoutubeCallback) {
+		cacheTime = 0;
+	}
+
 	if(Date.now() - lastIdFetch < cacheTime) {
 		return lastId;
 	}
 
-	if(nearWan && Math.random() < 0.75) {
+	let isYoutubeCallbackExpiry = false;
+	if(lastYoutubeCallback.date !== lastHandledYoutubeCallback) {
+		isYoutubeCallbackExpiry = true;
+		lastHandledYoutubeCallback = lastYoutubeCallback.date;
+	}
+
+	if((nearWan && Math.random() < 0.75) || lastYoutubeCallback) {
 		// if we are near wan, then 75% chance, check if floatplane is live. If it is, use proxy
-		const useProxy = wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
-			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive);
+		const useProxy = isYoutubeCallbackExpiry || (wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
+			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive));
 		if(useProxy || env.DEV) {
 			console.log("Fetching canonical from proxy!")
 			lastIdFetch = Date.now();
