@@ -3,6 +3,8 @@ main = "src/worker.ts"
 compatibility_date = "2023-07-10"
 account_id = "f55b85c8a963663b11036975203c63c0"
 
+[observability]
+enabled = true
 
 # Bind another Worker service. Use this binding to call another Worker without network overhead.
 # Docs: https://developers.cloudflare.com/workers/platform/services
