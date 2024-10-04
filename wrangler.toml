@@ -6,6 +6,11 @@ account_id = "f55b85c8a963663b11036975203c63c0"
 [observability]
 enabled = true
 
+[triggers]
+crons = [
+	"0 0 */4 * *" # Re-subscribe to youtube pubsubhubbub thing. Max lease length is 5 days, so run this every 4 days
+]
+
 # Bind another Worker service. Use this binding to call another Worker without network overhead.
 # Docs: https://developers.cloudflare.com/workers/platform/services
 # [[services]]

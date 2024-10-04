@@ -50,4 +50,36 @@ export default {
 		const stub = env.WHENISWAN_FETCHER.get(id);
 		return stub.fetch(request.url)
 	},
+	async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+		if(event.cron === "0 0 */4 * *") {
+			let form = new FormData();
+
+			const formData: {[key: string]: string} = {
+				"hub.callback": "https://wheniswan-fetcher.ajg.workers.dev/youtube-callback",
+				"hub.topic": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw",
+				"hub.verify": "sync",
+				"hub.mode": "subscribe",
+				"hub.verify_token": "",
+				"hub.secret": "",
+				"hub.lease_numbers": "432000"
+			}
+
+			for (let formDataKey in formData) {
+				form.set(formDataKey, formData[formDataKey]);
+			}
+
+			const response = await fetch("https://pubsubhubbub.appspot.com/subscribe", {
+				method: "POST",
+				body: form
+			});
+
+			if(response.ok) {
+				console.log("Successfully subscribed!")
+			} else {
+				console.error("Failed to subscribe!", response.status, response.statusText, await response.text());
+			}
+		} else {
+			console.error("Unknown cron " + event.cron + "!");
+		}
+	}
 };
