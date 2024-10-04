@@ -33,8 +33,10 @@ export class FetcherObject {
 				const topic = url.searchParams.get("hub.topic");
 				const challenge = url.searchParams.get("hub.challenge");
 				if(topic === "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw") {
+					console.debug("Valid hub challenge!")
 					return new Response(challenge);
 				} else {
+					console.debug("Invalid hub challenge!")
 					return new Response("Invalid topic!", {status: 400})
 				}
 			}
