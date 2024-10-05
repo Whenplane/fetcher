@@ -50,7 +50,8 @@ export async function getLivestreamId(env: Env) {
 			console.log("Fetching canonical from proxy!")
 			lastIdFetch = Date.now();
 			lastId = await fetch("https://fp-proxy.ajg0702.us/youtube-canonical")
-				.then(r => r.json()).then(r => (r as {fetched: number, videoId: string | undefined}).videoId)
+				.then(r => r.json()).then(r => (r as {fetched: number, videoId: string | undefined}).videoId);
+			console.log("got", lastId, "from proxy")
 			lastIdFetch = Date.now();
 			if(lastId) lastHadId = Date.now();
 			return lastId;
