@@ -1,6 +1,7 @@
 import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 import { isNearWan, isNight } from '../../utils';
+import { getLivestreamIdViaAPI } from './api';
 
 
 let lastIdFetch = 0;
@@ -42,16 +43,15 @@ export async function getLivestreamId(env: Env) {
 		lastHandledYoutubeCallback = lastYoutubeCallback.date;
 	}
 
-	if((nearWan && Math.random() < 0.75) || lastYoutubeCallback) {
-		// if we are near wan, then 75% chance, check if floatplane is live. If it is, use proxy
-		const useProxy = isYoutubeCallbackExpiry || (wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
+	if((nearWan && Math.random() < 0.50) || lastYoutubeCallback) {
+		// if we are near wan, then 50% chance, check if floatplane is live. If it is, use api
+		const useApi = isYoutubeCallbackExpiry || (wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
 			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive));
-		if(useProxy || env.DEV) {
-			console.log("Fetching canonical from proxy!")
+		if(useApi || env.DEV) {
+			console.log("Fetching canonical from api!")
 			lastIdFetch = Date.now();
-			lastId = await fetch("https://fp-proxy.ajg0702.us/youtube-canonical")
-				.then(r => r.json()).then(r => (r as {fetched: number, videoId: string | undefined}).videoId);
-			console.log("got", lastId, "from proxy")
+			lastId = await getLivestreamIdViaAPI(env);
+			console.log("got", lastId, "from api")
 			lastIdFetch = Date.now();
 			if(lastId) lastHadId = Date.now();
 			return lastId;

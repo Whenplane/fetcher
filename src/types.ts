@@ -16,6 +16,37 @@ export type SpecificResponse = {
 	}
 }
 
+export type ListResponse = {
+	"kind": "youtube#searchListResponse",
+	"etag": string,
+	"nextPageToken": string,
+	"prevPageToken": string,
+	"regionCode": string,
+	"pageInfo": {
+		"totalResults": number,
+		"resultsPerPage": number
+	},
+	"items": {
+		"kind": "youtube#searchResult",
+		"etag": string,
+		"id": {
+			"kind": string,
+			"videoId": string,
+			"channelId": string,
+			"playlistId": string
+		},
+		"snippet": {
+			"publishedAt": string,
+			"channelId": string,
+			"title": string,
+			"description": string,
+			"thumbnails": YoutubeThumbnails,
+			"channelTitle": string,
+			"liveBroadcastContent": string
+		}
+	}[]
+}
+
 export type YoutubeSnippet = {
 	publishedAt: string,
 	channelId: string,

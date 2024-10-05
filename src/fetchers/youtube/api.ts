@@ -1,6 +1,6 @@
 import { Env } from '../../worker';
-import { v } from './index';
-import { SpecificResponse } from '../../types';
+import { CHANNEL, v } from './index';
+import { ListResponse, SpecificResponse } from '../../types';
 import { get, put } from '../../storageCacher';
 
 
@@ -123,4 +123,29 @@ async function realGetSpecificDetails(env: Env, id: string) {
 		"&eventType=live,upcoming" +
 		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json()) as SpecificResponse;
+}
+
+
+
+
+
+
+export async function getLivestreamIdViaAPI(env: Env) {
+	const liveData: ListResponse = await fetch(
+		"https://www.googleapis.com/youtube/v3/search" +
+		"?part=snippet,id" +
+		"&channelId=" + CHANNEL +
+		"&maxResults=50" +
+		"&order=date" +
+		"&type=video" +
+		"&eventType=live" +
+		"&date=" + Date.now() +
+		"&key=" + env.YOUTUBE_KEY
+	).then(r => r.json())
+
+	let wanId = liveData.items.find(v => v.snippet.title.toLowerCase().includes("wan"))?.id.videoId;
+	if(wanId) return wanId;
+
+	return liveData.items[0]?.id.videoId;
+
 }
