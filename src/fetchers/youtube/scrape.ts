@@ -43,7 +43,7 @@ export async function getLivestreamId(env: Env) {
 		lastHandledYoutubeCallback = lastYoutubeCallback.date;
 	}
 
-	if((nearWan && Math.random() < 0.50) || lastYoutubeCallback) {
+	if((nearWan && Math.random() < (wasLiveRecently ? 0.01 : 0.50)) || lastYoutubeCallback) {
 		// if we are near wan, then 50% chance, check if floatplane is live. If it is, use api
 		const useApi = isYoutubeCallbackExpiry || (wasLiveRecently ? true : await fetch("https://fp-proxy.ajg0702.us/channel/linustechtips")
 			.then(r => r.json()).then(r => (r as {isLive: boolean}).isLive));
