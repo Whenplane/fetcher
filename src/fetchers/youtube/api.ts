@@ -137,14 +137,24 @@ export async function getLivestreamIdViaAPI(env: Env) {
 		"&channelId=" + CHANNEL +
 		"&maxResults=50" +
 		"&order=date" +
-		"&type=video" +
+		"&type=video,upcoming" +
 		"&eventType=live" +
 		"&date=" + Date.now() +
 		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json())
 
+	console.debug("Livestream list response has " + liveData?.items?.length + " items");
+	if(!liveData?.items?.length) {
+		console.log({liveData})
+	}
+
 	let wanId = liveData.items.find(v => v.snippet.title.toLowerCase().includes("wan"))?.id.videoId;
-	if(wanId) return wanId;
+	if(wanId) {
+		console.debug("Returning wan id", wanId)
+		return wanId;
+	}
+
+	console.log("Returning first item's id if it exists")
 
 	return liveData.items[0]?.id.videoId;
 
