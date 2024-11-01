@@ -2,10 +2,14 @@ import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 import { isNearWan, isNight } from '../../utils';
 import { getLivestreamIdViaAPI } from './api';
+import { get, put } from '../../storageCacher';
 
 
 let lastIdFetch = 0;
 let lastId: string | undefined | null;
+function saveLastId(state: DurableObjectState) {
+	state.waitUntil(put(state, "youtube-lastId", {lastId, lastIdFetch}));
+}
 
 export let lastYoutubeCallback = {date: 0};
 let lastHandledYoutubeCallback = 0;
@@ -16,8 +20,17 @@ let nullCount = 0;
 
 let wEnv: Env;
 
-export async function getLivestreamId(env: Env) {
+export async function getLivestreamId(env: Env, state: DurableObjectState) {
 	wEnv = env;
+	if(lastIdFetch === 0 && typeof lastId === "undefined") {
+		const savedId: {lastId: string | undefined | null, lastIdFetch: number} | undefined = await get(state, "youtube-lastId");
+		if(savedId) {
+			lastIdFetch = savedId.lastIdFetch;
+			lastId = savedId.lastId;
+		}
+	}
+
+
 	const nearWan = isNearWan();
 	let cacheTime = nearWan ? 10e3 : 60e3;
 
@@ -54,6 +67,9 @@ export async function getLivestreamId(env: Env) {
 			console.log("got", lastId, "from api")
 			lastIdFetch = Date.now();
 			if(lastId) lastHadId = Date.now();
+
+			saveLastId(state);
+
 			return lastId;
 		}
 	}
@@ -68,9 +84,10 @@ export async function getLivestreamId(env: Env) {
 	lastIdFetch = Date.now(); // do this here just in case something requests while below is executing
 	const fetchedId = await realGetLivestreamId();
 	if(fetchedId !== null || !lastId) {
-		lastId = await realGetLivestreamId()
+		lastId = await realGetLivestreamId();
 	}
 	lastIdFetch = Date.now() + (Math.min(cacheTime, 2 * 60 * 60e3) * Math.random());
+	saveLastId(state);
 
 	return lastId;
 }
