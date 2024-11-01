@@ -1,6 +1,6 @@
 import { Env } from '../../worker';
 import { CHANNEL, v } from './index';
-import { ListResponse, SpecificResponse } from '../../types';
+import { SearchResponse, SpecificResponse } from '../../types';
 import { get, put } from '../../storageCacher';
 
 
@@ -130,8 +130,8 @@ async function realGetSpecificDetails(env: Env, id: string) {
 
 
 
-export async function getLivestreamIdViaAPI(env: Env) {
-	const liveData: ListResponse = await fetch(
+export async function getLivestreamIdViaSearchAPI(env: Env) {
+	const liveData: SearchResponse = await fetch(
 		"https://www.googleapis.com/youtube/v3/search" +
 		"?part=snippet,id" +
 		"&channelId=" + CHANNEL +

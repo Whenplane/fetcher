@@ -1,7 +1,7 @@
 import { CHANNEL, v } from './index';
 import { Env } from '../../worker';
 import { isNearWan, isNight } from '../../utils';
-import { getLivestreamIdViaAPI } from './api';
+import { getLivestreamIdViaSearchAPI } from './api';
 import { get, put } from '../../storageCacher';
 
 
@@ -63,7 +63,7 @@ export async function getLivestreamId(env: Env, state: DurableObjectState) {
 		if(useApi || env.DEV) {
 			console.log("Fetching canonical from api!")
 			lastIdFetch = Date.now();
-			lastId = await getLivestreamIdViaAPI(env);
+			lastId = await getLivestreamIdViaSearchAPI(env);
 			console.log("got", lastId, "from api")
 			lastIdFetch = Date.now();
 			if(lastId) lastHadId = Date.now();
