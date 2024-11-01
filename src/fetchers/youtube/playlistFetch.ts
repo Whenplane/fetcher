@@ -17,6 +17,7 @@ export async function getLivestreamIdViaListAPI(env: Env) {
 	lastFetch = Date.now(); // to make sure another one doesnt start fetching while this fetch is in progress
 	lastId = await realGetLivestreamIdViaListAPI(env);
 	lastFetch = Date.now();
+	return lastId;
 }
 
 export async function realGetLivestreamIdViaListAPI(env: Env) {
