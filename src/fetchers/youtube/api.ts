@@ -9,7 +9,9 @@ let lastMissingStartTimeSend = 0;
 
 let startingSoonCount = 0;
 
-const quickLastFetch: {[id: string]: number} = {}
+const quickLastFetch: {[id: string]: number} = {};
+
+let lastUpcomingLower = 0;
 
 export async function getSpecificDetails(state: DurableObjectState, env: Env, id: string) {
 	const LAST_FETCH = "api_specific_3:" + id + ":lastFetch";
@@ -65,9 +67,13 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 				const scheduled = new Date(item.liveStreamingDetails.scheduledStartTime);
 				const timeUntilScheduledStart = scheduled.getTime() - Date.now();
 				if(timeUntilScheduledStart < 10e3) {
-					startingSoonCount++;
-					console.log("Stream is supposed to be starting soon! Lowering cache time to " + (10 + startingSoonCount))
-					cacheTime = 10e3 + (startingSoonCount * 1e3);
+					let realStartingSoonCount = Math.min(startingSoonCount, 20)
+					if(Date.now() - lastUpcomingLower > 10e3) {
+						startingSoonCount++;
+						realStartingSoonCount = Math.min(startingSoonCount, 20)
+						console.log("Stream is supposed to be starting soon! Lowering cache time to " + (10 + realStartingSoonCount))
+					}
+					cacheTime = 10e3 + (realStartingSoonCount * 1e3);
 				} else {
 					// only cache for 2 minutes when the stream is upcoming
 					cacheTime = 2 * 60e3;
