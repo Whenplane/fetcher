@@ -31,6 +31,10 @@ export async function realGetLivestreamIdViaListAPI(env: Env) {
 		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json())
 
+	if(!isIterable(listData.items as never)) {
+		console.warn("Non-iterable listData.items:", listData.items, listData);
+	}
+
 	let videoId = null;
 	for (let item of listData.items) {
 		if(!item.snippet?.thumbnails.default?.url.includes("_live")) continue;
@@ -38,4 +42,12 @@ export async function realGetLivestreamIdViaListAPI(env: Env) {
 	}
 
 	return videoId;
+}
+
+function isIterable(obj: never) {
+	// checks for null and undefined
+	if (obj == null) {
+		return false;
+	}
+	return typeof obj[Symbol.iterator] === 'function';
 }
