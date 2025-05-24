@@ -33,7 +33,7 @@ export async function getSpecificDetails(state: DurableObjectState, env: Env, id
 				cacheTime = 10e3 + (30e3 * Math.min(startRetryCount++, 30));
 
 				// send an alert if this happens with the data
-				if(env.DISCORD_WEBHOOK && Date.now() - lastMissingStartTimeSend > 10e3) { // limit to one message every 10 seconds
+				if(env.DISCORD_WEBHOOK && Date.now() - lastMissingStartTimeSend > 10e3 && item.snippet.liveBroadcastContent !== "upcoming") { // limit to one message every 10 seconds
 					v((async () => {
 						if(!env.DISCORD_WEBHOOK) return;
 
