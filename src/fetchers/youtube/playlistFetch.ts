@@ -8,7 +8,7 @@ let lastFetch = 0;
 let lastId: string | null | undefined;
 
 export async function getLivestreamIdViaListAPI(env: Env) {
-	const cache_time = isNearWan() && !lastId ? 8e3 : 9.99e3;
+	const cache_time = isNearWan() && !lastId ? 5e3 : 9.99e3;
 
 	if(Date.now() - lastFetch < cache_time) {
 		return lastId;
