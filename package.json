@@ -9,7 +9,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",
     "typescript": "^5.8.2",
-    "wrangler": "^3.78.6"
+    "wrangler": "^4.10.0"
   },
 	"dependencies": {
 		"whenplane": "github:whenplane/whenplane"
