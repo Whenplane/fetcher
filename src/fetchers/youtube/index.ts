@@ -35,7 +35,7 @@ export async function getData(state: DurableObjectState, env: Env) {
 	}
 
 	return {
-		videoId,
+		videoId: videoId ?? undefined,
 		isLive,
 		upcoming,
 		isWAN,
