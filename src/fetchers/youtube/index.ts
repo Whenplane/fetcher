@@ -3,6 +3,7 @@ import { getSpecificDetails } from './api';
 import { getLivestreamIdViaListAPI } from './playlistFetch';
 
 
+// unused for playlist - see playlistFetch to change channel
 export const CHANNEL = "UCXuqSBlHAE6Xw-yeJA0Tunw"; // linus tech tips
 // export const CHANNEL = "UCSJ4gkVC6NrvII8umztf0Ow" // lofi girl (for testing, since they're always live)
 

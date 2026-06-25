@@ -1,5 +1,4 @@
 import { PlayListResponse } from '../../types';
-import { CHANNEL } from './index';
 import { Env } from '../../worker';
 import { isNearWan } from '../../utils';
 
@@ -25,8 +24,8 @@ export async function realGetLivestreamIdViaListAPI(env: Env) {
 		"https://www.googleapis.com/youtube/v3/playlistItems" +
 		"?part=snippet,contentDetails" +
 		// "&playlistId=" + CHANNEL.replace("UC", "UU") + // channel playlist
-		// "&playlistId=PL8mG-RkN2uTw7PhlnAr4pZZz2QubIbujH" + // wan playlist (on ltt channel)
-		"&playlistId=PLHBf9_NALwsau1CqVY_liahkDvEAqj6v-" + // wan playlist (on wan show channel)
+		"&playlistId=PL8mG-RkN2uTw7PhlnAr4pZZz2QubIbujH" + // wan playlist (on ltt channel)
+		// "&playlistId=PLHBf9_NALwsau1CqVY_liahkDvEAqj6v-" + // wan playlist (on lmg clips channel)
 		"&maxResults=50" +
 		"&order=date" +
 		"&date=" + Date.now() +
