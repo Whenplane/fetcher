@@ -43,7 +43,7 @@ export async function realGetLivestreamIdViaListAPI(env: Env) {
 
 	let videoId = null;
 	for (let item of listData.items) {
-		if(!item.snippet?.thumbnails.default?.url.includes("_live")) continue;
+		if(!item.snippet?.thumbnails.default?.url.includes("_live") && !item.snippet?.thumbnails.default?.url.includes("?v=")) continue;
 		videoId = item.contentDetails?.videoId;
 	}
 
