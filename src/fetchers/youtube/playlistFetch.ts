@@ -33,6 +33,8 @@ export async function realGetLivestreamIdViaListAPI(env: Env) {
 		"&key=" + env.YOUTUBE_KEY
 	).then(r => r.json())
 
+	console.debug("Playlist response:", listData)
+
 	if(!isIterable(listData.items as never)) {
 		console.warn("Non-iterable listData.items:", listData.items, listData);
 	}
