@@ -8,8 +8,10 @@ let lastId: string | null | undefined;
 
 export async function getLivestreamIdViaListAPI(env: Env) {
 	const cache_time = isNearWan() && !lastId ? 5e3 : 9.99e3;
+	console.debug("Using cache_time of", cache_time);
 
 	if(Date.now() - lastFetch < cache_time) {
+		console.debug("Returning cached due to lastFetch of", lastFetch);
 		return lastId;
 	}
 
