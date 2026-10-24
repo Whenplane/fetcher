@@ -24,7 +24,7 @@ export async function getLivestreamIdViaListAPI(env: Env) {
 export async function realGetLivestreamIdViaListAPI(env: Env) {
 	const listData: PlayListResponse = await fetch(
 		"https://www.googleapis.com/youtube/v3/playlistItems" +
-		"?part=snippet,contentDetails,player,id" +
+		"?part=snippet,contentDetails,id" +
 		// "&playlistId=" + CHANNEL.replace("UC", "UU") + // channel playlist
 		// "&playlistId=PL8mG-RkN2uTw7PhlnAr4pZZz2QubIbujH" + // wan playlist (on ltt channel)
 		// "&playlistId=PLHBf9_NALwsau1CqVY_liahkDvEAqj6v-" + // wan playlist (on lmg clips channel)
